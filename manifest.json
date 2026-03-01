@@ -1,0 +1,28 @@
+{
+  "name": "VoCall — ক্রিস্টাল ক্লিয়ার কথোপকথন",
+  "short_name": "VoCall",
+  "description": "ওয়েবসাইটের মাধ্যমে ক্রিস্টাল ক্লিয়ার অডিও কল ও চ্যাট করুন",
+  "start_url": "/vocall/index.html",
+  "scope": "/vocall/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050810",
+  "theme_color": "#050810",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["communication", "social"],
+  "lang": "bn"
+}
