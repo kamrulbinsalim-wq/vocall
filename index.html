@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#00d4ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VoCall">
+  <meta name="description" content="Simple, fast audio & video calling app">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#00d4ff">
+  <meta name="format-detection" content="telephone=no">
+  <title>VoCall</title>
+  <link rel="manifest" href="https://kamrulbinsalim.github.io/manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300d4ff'/><text y='.9em' font-size='80' x='10'>📞</text></svg>">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+<noscript><div style="display:flex;height:100vh;align-items:center;justify-content:center;background:#07080f;color:#fff;font-family:sans-serif;text-align:center;padding:20px">JavaScript is required to use VoCall.</div></noscript>
+
+<!-- ══════════════════ LOADING ══════════════════ -->
+<div id="loadingOverlay">
+  <div class="loader"></div>
+  <div style="color:#8892b0;font-size:14px">Loading VoCall…</div>
+</div>
+
+<!-- ══════════════════ PERMISSION GATE ══════════════════ -->
+<div id="permissionScreen" class="screen hidden">
+  <div class="perm-logo">📞</div>
+  <div class="perm-title">VoCall</div>
+  <div class="perm-sub">To use this app, please grant the<br>following permissions.</div>
+  <div class="perm-list">
+    <div class="perm-item">
+      <div class="icon">🎙️</div>
+      <div><div>Microphone</div><div class="desc">For audio & video calls</div></div>
+    </div>
+    <div class="perm-item">
+      <div class="icon">📷</div>
+      <div><div>Camera</div><div class="desc">For video calls</div></div>
+    </div>
+    <div class="perm-item">
+      <div class="icon">🔔</div>
+      <div><div>Notifications</div><div class="desc">For incoming calls & messages</div></div>
+    </div>
+    <div class="perm-item">
+      <div class="icon">⚡</div>
+      <div><div>Install App</div><div class="desc">Add to home screen for best experience</div></div>
+    </div>
+  </div>
+  <button class="btn-allow" id="btnAllow">Grant Permissions & Install</button>
+  <button class="btn-deny" id="btnDeny">No thanks, exit</button>
+</div>
+
+<!-- ══════════════════ AUTH SCREEN ══════════════════ -->
+<div id="authScreen" class="screen hidden">
+  <div class="auth-logo">VoCall</div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" data-tab="login">Login</button>
+    <button class="auth-tab" data-tab="register">Register</button>
+  </div>
+  <div class="auth-form">
+    <!-- LOGIN -->
+    <div class="tab-content active" id="tab-login">
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button class="btn-primary" id="btnLogin">Login</button>
+    </div>
+    <!-- REGISTER -->
+    <div class="tab-content" id="tab-register">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="Your Name" autocomplete="name">
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="regPass" placeholder="Min 6 characters" autocomplete="new-password">
+      </div>
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <input type="password" id="regPass2" placeholder="Repeat password" autocomplete="new-password">
+      </div>
+      <div class="auth-error" id="regError"></div>
+      <button class="btn-primary" id="btnRegister">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MAIN APP ══════════════════ -->
+<div id="mainScreen" class="screen hidden">
+  <div class="topbar">
+    <div class="topbar-title">VoCall</div>
+    <div class="topbar-user">
+      <div class="online-dot"></div>
+      <div class="avatar" id="userAvatar">U</div>
+      <button id="btnLogout" style="background:none;border:none;color:#8892b0;font-size:20px;cursor:pointer;padding:4px" title="Logout">⚙️</button>
+    </div>
+  </div>
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <!-- CALLS PANEL -->
+    <div class="panel active" id="panel-calls">
+      <div class="section-header">
+        <div class="section-title">Recent Calls</div>
+        <button class="btn-new-call" id="btnNewCall"><span>＋</span> New Call</button>
+      </div>
+      <div id="callList" style="flex:1;overflow-y:auto"></div>
+    </div>
+    <!-- CHAT PANEL -->
+    <div class="panel" id="panel-chat">
+      <div class="section-header">
+        <div class="section-title">Messages</div>
+        <button class="btn-new-call" id="btnNewChat"><span>＋</span> New Chat</button>
+      </div>
+      <div id="chatList" style="flex:1;overflow-y:auto"></div>
+    </div>
+  </div>
+  <nav class="bottomnav">
+    <button class="nav-btn active" data-panel="calls">
+      <span class="nav-icon">📞</span>
+      <span class="nav-label">CALLS</span>
+      <span class="badge" id="callBadge">0</span>
+    </button>
+    <button class="nav-btn" data-panel="chat">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">CHAT</span>
+      <span class="badge" id="chatBadge">0</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════════════ INCOMING CALL ══════════════════ -->
+<div id="incomingScreen" class="screen hidden">
+  <div class="incoming-info">
+    <div class="incoming-avatar" id="incomingCallerAvatar">U</div>
+    <div class="incoming-label">Incoming Call</div>
+    <div class="incoming-name" id="incomingCallerName">Someone</div>
+    <div class="incoming-type" id="incomingCallType">🔊 Audio Call</div>
+  </div>
+  <div class="incoming-actions">
+    <button class="btn-decline" id="btnDecline">📵<span>Decline</span></button>
+    <button class="btn-answer"  id="btnAnswer">📞<span>Answer</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════ ACTIVE CALL SCREEN ══════════════════ -->
+<div id="callScreen" class="screen hidden">
+  <div class="call-video-wrap">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo"  autoplay playsinline muted></video>
+    <audio id="remoteAudio" autoplay style="display:none"></audio>
+    <div class="call-status-overlay" id="callStatusOverlay">
+      <div class="call-avatar-big" id="callPeerAvatar">U</div>
+      <div class="call-peer-name" id="callPeerName">Calling…</div>
+      <div class="call-state" id="callState">Connecting</div>
+      <div class="call-timer" id="callTimerDisplay">00:00</div>
+    </div>
+  </div>
+  <div class="call-controls">
+    <button class="ctrl-btn" id="btnMute">
+      <span>🎤</span><span class="ctrl-label">Mute</span>
+    </button>
+    <button class="ctrl-btn" id="btnSpeaker">
+      <span>🔈</span><span class="ctrl-label">Speaker</span>
+    </button>
+    <button class="ctrl-btn" id="btnCam" style="display:none">
+      <span>📷</span><span class="ctrl-label">Camera</span>
+    </button>
+    <button class="ctrl-btn" id="btnFlip" style="display:none">
+      <span>🔄</span><span class="ctrl-label">Flip</span>
+    </button>
+    <button class="ctrl-btn end-call" id="btnEndCall">📵</button>
+  </div>
+</div>
+
+<!-- ══════════════════ CHAT CONVERSATION ══════════════════ -->
+<div id="chatConvScreen" class="screen hidden">
+  <div class="chat-header">
+    <button class="btn-back" id="btnBackChat">‹</button>
+    <div class="avatar" id="convPeerAvatar" style="flex-shrink:0">U</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name" id="convPeerName">Chat</div>
+      <div class="chat-header-status">Online</div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="btn-header-action" id="convBtnAudio" title="Audio call">📞</button>
+      <button class="btn-header-action" id="convBtnVideo" title="Video call">🎥</button>
+    </div>
+  </div>
+  <div class="messages-wrap" id="messagesWrap"></div>
+  <div class="chat-input-bar">
+    <div class="chat-input-wrap">
+      <textarea id="msgInput" placeholder="Type a message…" rows="1"></textarea>
+    </div>
+    <button class="btn-send" id="btnSendMsg" disabled>➤</button>
+  </div>
+</div>
+
+<!-- ══════════════════ NEW CALL MODAL ══════════════════ -->
+<div class="modal-overlay" id="newCallModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Call</div>
+    <input class="search-input" id="userSearch" type="search" placeholder="Search by email…">
+    <div id="searchResults"></div>
+    <div class="call-btns" id="callActionBtns" style="display:none">
+      <button class="btn-do-audio" id="btnDoAudio">📞 Audio Call</button>
+      <button class="btn-do-video" id="btnDoVideo">🎥 Video Call</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ NEW CHAT MODAL ══════════════════ -->
+<div class="modal-overlay" id="newChatModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Message</div>
+    <input class="search-input" id="chatUserSearch" type="search" placeholder="Search by name or email…">
+    <div id="chatSearchResults"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ TOAST ══════════════════ -->
+<div id="toast"></div>
+
+<!-- ══════════════════ SCRIPTS ══════════════════ -->
+<!-- Firebase (CDN) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<!-- Config + App (only 2 local JS files needed) -->
+<script>
+// ─── CONFIG (inline so no extra file needed) ───────────────────────────────
+const SOLVIX_CONFIG = {
+  firebase: {
+    apiKey:            'AIzaSyAMCmZBxZoha4gWB5elP0p3qz1LHjTXo9s',
+    authDomain:        'infobooks-4358d.firebaseapp.com',
+    projectId:         'infobooks-4358d',
+    storageBucket:     'infobooks-4358d.firebasestorage.app',
+    messagingSenderId: '938954145740',
+    appId:             '1:938954145740:web:ee2a334f8f0e621f552769',
+    databaseURL:       'https://infobooks-4358d-default-rtdb.asia-southeast1.firebasedatabase.app',
+  },
+  cloudinary: {
+    cloudName:    'dlporj4u2',
+    uploadPreset: 'vocall_media',
+    autoUrl:      'https://api.cloudinary.com/v1_1/dlporj4u2/auto/upload',
+  },
+  cloudflare: {
+    tokenId:   '510b86ac28b27abf403017bbfd7378f1',
+    apiToken:  '28b748e7316644a526981aac3be1a7dafadd41d4277243ad6193d4c7aaa1e31a',
+    workerUrl: 'https://vocall.kamrulbinsalim.workers.dev',
+  },
+  ice: {
+    iceServers: [
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      { urls: 'stun:stun.l.google.com:19302'  },
+    ],
+  },
+  notifications: {
+    enabled:  true,
+    vapidKey: 'BD4GfVND0yPwtjxC4y0LHx48LRu7HK-XbtgRdSEhgaaxg2M-2T1Se2kxnYc3RyNpvk35KeMQk_FH1_iM0eDQX8c',
+  },
+};
+</script>
+<script src="app.js"></script>
+</body>
+</html>
